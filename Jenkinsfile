@@ -29,8 +29,9 @@
         script {
           def tag = "${IMAGE_NAME}:${env.BUILD_NUMBER}"
           echo "Building Docker image with tag: ${tag}"
-          sh "docker build -t ${tag} ."
-          // Also tag as latest
+          // since Dockerfile is inside 'app' folder
+          sh "docker build -t ${tag} ./app"
+          // also tag as latest
           sh "docker tag ${tag} ${IMAGE_NAME}:latest"
           env.IMAGE_TAG = tag
         }
