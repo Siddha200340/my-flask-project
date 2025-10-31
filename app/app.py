@@ -22,15 +22,15 @@ def init_db():
 app = Flask(__name__, static_folder='static')
 app.secret_key = os.environ.get("FLASK_SECRET", "dev-secret-key")
 
-@app.before_first_request
-def setup():
+# ✅ Initialize the DB when the app starts (Flask 3.x safe)
+with app.app_context():
     init_db()
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
-@app.route("/register", methods=["GET","POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         username = request.form["username"].strip()
@@ -42,7 +42,7 @@ def register():
         try:
             conn = sqlite3.connect(DB_PATH)
             c = conn.cursor()
-            c.execute("INSERT INTO users (username, password_hash) VALUES (?,?)", (username, pw_hash))
+            c.execute("INSERT INTO users (username, password_hash) VALUES (?, ?)", (username, pw_hash))
             conn.commit()
             conn.close()
             flash("Registration successful. Please login.")
@@ -52,7 +52,7 @@ def register():
             return redirect(url_for("register"))
     return render_template("register.html")
 
-@app.route("/login", methods=["GET","POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"].strip()

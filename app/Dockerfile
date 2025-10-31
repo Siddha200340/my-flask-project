@@ -1,24 +1,18 @@
-# use a small python base
-FROM python:3.11-alpine
+# Use a lightweight Python base image
+FROM python:3.11-slim
 
-# set working dir
+# Set working directory inside container
 WORKDIR /app
 
-# system deps for sqlite & building wheels
-RUN apk add --no-cache gcc musl-dev linux-headers sqlite sqlite-dev
-
-# copy requirements and install
+# Copy and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# copy app code
+# Copy all app files
 COPY . .
 
-# create empty sqlite DB file (permissions)
-RUN python -c "from app import init_db; init_db(); print('db init done')"
-
-# expose the app port
+# Expose port 8000
 EXPOSE 8000
 
-# run via gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app", "--workers", "2"]
+# Run the app with Gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
