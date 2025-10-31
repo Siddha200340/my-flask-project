@@ -51,7 +51,7 @@
     stage('Deploy to EC2') {
       steps {
         echo "Deploying to EC2 instance..."
-        sshagent (credentials: [SSH_CRED_ID]) {
+        sshagent (credentials: [env.SSH_CRED_ID]) {
           sh """
             ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} '
               sudo docker pull ${IMAGE_TAG} &&
